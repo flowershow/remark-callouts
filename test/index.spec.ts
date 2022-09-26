@@ -8,7 +8,9 @@ import rehypeStringify from 'rehype-stringify'
 import callouts, { Config } from '../src'
 
 async function mdToHtml(md: string, options?: Partial<Config>) {
-  return String(await remark().use(remarkParse).use(callouts, options).use(remarkRehype).use(rehypeStringify).process(md))
+  return String(
+    await remark().use(remarkParse).use(callouts, options).use(remarkRehype).use(rehypeStringify).process(md)
+  )
 }
 
 describe('remark callouts', function () {
@@ -26,12 +28,12 @@ describe('remark callouts', function () {
 > [!tip]
 > example content here
     `)
-      const doc = parseDocument(html)
-      const calloutTitle = selectOne('div > blockquote.callout > div.callout-title.tip > strong', doc)
-      const calloutContent = selectOne('div > blockquote.callout > div.callout-content > p', doc)
+    const doc = parseDocument(html)
+    const calloutTitle = selectOne('div > blockquote.callout > div.callout-title.tip > strong', doc)
+    const calloutContent = selectOne('div > blockquote.callout > div.callout-content > p', doc)
 
-      expect(calloutTitle).to.have.nested.property('firstChild.data', 'Tip')
-      expect(calloutContent).to.have.nested.property('firstChild.data', 'example content here')
+    expect(calloutTitle).to.have.nested.property('firstChild.data', 'Tip')
+    expect(calloutContent).to.have.nested.property('firstChild.data', 'example content here')
   })
 
   it('parses a blockquote callout with an icon', async function () {
@@ -39,10 +41,10 @@ describe('remark callouts', function () {
 > [!tip]
 > example content here
     `)
-      const doc = parseDocument(html)
-      const calloutIcon = selectOne('div > blockquote.callout > div.callout-title.tip > span > svg', doc)
+    const doc = parseDocument(html)
+    const calloutIcon = selectOne('div > blockquote.callout > div.callout-title.tip > span > svg', doc)
 
-      expect(calloutIcon).to.exist
+    expect(calloutIcon).to.exist
   })
 
   it('parses a blockquote callout with a custom title', async function () {
@@ -50,10 +52,10 @@ describe('remark callouts', function () {
 > [!tip] Custom Title
 > content
     `)
-      const doc = parseDocument(html)
-      const calloutTitle = selectOne('div > blockquote.callout > div.callout-title.tip > strong', doc)
+    const doc = parseDocument(html)
+    const calloutTitle = selectOne('div > blockquote.callout > div.callout-title.tip > strong', doc)
 
-      expect(calloutTitle).to.have.nested.property('firstChild.data', 'Custom Title')
+    expect(calloutTitle).to.have.nested.property('firstChild.data', 'Custom Title')
   })
 
   it('parses a blockquote callout with unknown type to use note', async function () {
@@ -61,10 +63,10 @@ describe('remark callouts', function () {
 > [!xyz]
 > content
     `)
-      const doc = parseDocument(html)
-      const calloutTitle = selectOne('div > blockquote.callout > div.callout-title.note > strong', doc)
+    const doc = parseDocument(html)
+    const calloutTitle = selectOne('div > blockquote.callout > div.callout-title.note > strong', doc)
 
-      expect(calloutTitle).to.have.nested.property('firstChild.data', 'Xyz')
+    expect(calloutTitle).to.have.nested.property('firstChild.data', 'Xyz')
   })
 
   it('parses a blockquote callout with unknown type and custom title', async function () {
@@ -72,10 +74,10 @@ describe('remark callouts', function () {
 > [!xyz] Some title
 > content
     `)
-      const doc = parseDocument(html)
-      const calloutTitle = selectOne('div > blockquote.callout > div.callout-title.note > strong', doc)
+    const doc = parseDocument(html)
+    const calloutTitle = selectOne('div > blockquote.callout > div.callout-title.note > strong', doc)
 
-      expect(calloutTitle).to.have.nested.property('firstChild.data', 'Some title')
+    expect(calloutTitle).to.have.nested.property('firstChild.data', 'Some title')
   })
 
   it('parses a nested blockquote with callout', async function () {
@@ -85,36 +87,36 @@ describe('remark callouts', function () {
 > > [!info]
 > > nested callout
     `)
-      const doc = parseDocument(html)
-      const nestedCallout = selectOne(
-        'div > blockquote.callout > div.callout-content > div > blockquote.callout > div.callout-title > strong',
-        doc
-      )
+    const doc = parseDocument(html)
+    const nestedCallout = selectOne(
+      'div > blockquote.callout > div.callout-content > div > blockquote.callout > div.callout-title > strong',
+      doc
+    )
 
-      expect(nestedCallout).to.have.nested.property('firstChild.data', 'Info')
+    expect(nestedCallout).to.have.nested.property('firstChild.data', 'Info')
   })
 
   it('parses a blockquote with default styles', async function () {
     const html = await mdToHtml(`\
 > With default style
     `)
-      const doc = parseDocument(html)
-      const styles = selectOne('div > style', doc)
-      const blockquoteClass = selectOne('div > blockquote.blockquote', doc)
+    const doc = parseDocument(html)
+    const styles = selectOne('div > style', doc)
+    const blockquoteClass = selectOne('div > blockquote.blockquote', doc)
 
-      expect(styles).to.exist
-      expect(blockquoteClass).to.exist
+    expect(styles).to.exist
+    expect(blockquoteClass).to.exist
   })
 
   it('parses a blockquote with callout styles', async function () {
     const html = await mdToHtml(`\
 > [!tip]
     `)
-      const doc = parseDocument(html)
-      const styles = selectOne('div > style', doc)
-      const calloutClass = selectOne('div > blockquote.callout', doc)
+    const doc = parseDocument(html)
+    const styles = selectOne('div > style', doc)
+    const calloutClass = selectOne('div > blockquote.callout', doc)
 
-      expect(styles).to.exist
-      expect(calloutClass).to.exist
+    expect(styles).to.exist
+    expect(calloutClass).to.exist
   })
 })

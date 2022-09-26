@@ -17,6 +17,7 @@ See https://help.obsidian.md/How+to/Use+callouts for more.
 - [x] Supports dark and light mode styles
 
 Future support:
+
 - [ ] Support custom types and icons
 - [ ] Support custom aliases
 - [ ] Support Foldable callouts
@@ -35,12 +36,7 @@ npm install remark-callouts
 ```js
 import callouts from 'remark-callouts'
 
-await remark()
-  .use(remarkParse)
-  .use(callouts)
-  .use(remarkRehype)
-  .use(rehypeStringify)
-  .process(`\
+await remark().use(remarkParse).use(callouts).use(remarkRehype).use(rehypeStringify).process(`\
 > [!tip]
 > hello callout
 `)
@@ -53,7 +49,9 @@ HTML output
   <style>...</style>
   <blockquote class="callout">
     <div class="callout-title">
-      <span><svg>...</svg></span>
+      <span>
+        <svg>...</svg>
+      </span>
       <strong>Tip</strong>
     </div>
     <div class="callout-content">

@@ -5,9 +5,9 @@ import type { Blockquote, Heading } from 'mdast'
 import { parse } from 'svg-parser'
 import { types } from './types.js'
 
- // escape regex special characters
+// escape regex special characters
 function escapeRegExp(s: String) {
-  return s.replace(new RegExp(`[-[\\]{}()*+?.\\\\^$|/]`, 'g'), '\\$&');
+  return s.replace(new RegExp(`[-[\\]{}()*+?.\\\\^$|/]`, 'g'), '\\$&')
 }
 
 // match breaks
@@ -15,19 +15,17 @@ const find = /[\t ]*(?:\r?\n|\r)/g
 
 const callouts: Plugin = function (providedConfig?: Partial<Config>) {
   const config: Config = { ...defaultConfig, ...providedConfig }
-  const defaultKeywords: string = Object.keys(config.types)
-   .map(escapeRegExp)
-   .join('|');
+  const defaultKeywords: string = Object.keys(config.types).map(escapeRegExp).join('|')
 
   return function (tree) {
-    visit(tree, (node: any, index, parent: {[index: string]: any}) => {
+    visit(tree, (node: any, index, parent: { [index: string]: any }) => {
       // Filter required elems
       if (node.type !== 'blockquote') return
 
       /** add breaks to text without needing spaces or escapes (turns enters into <br>)
        *  code taken directly from remark-breaks,
-       *  see https://github.com/remarkjs/remark-breaks for more info on what this does. 
-      */
+       *  see https://github.com/remarkjs/remark-breaks for more info on what this does.
+       */
       visit(node, 'text', (node: any, index, parent) => {
         const result = []
         let start = 0
@@ -40,17 +38,17 @@ const callouts: Plugin = function (providedConfig?: Partial<Config>) {
           const position = match.index
 
           if (start !== position) {
-            result.push({type: 'text', value: node.value.slice(start, position)})
+            result.push({ type: 'text', value: node.value.slice(start, position) })
           }
 
-          result.push({type: 'break'})
+          result.push({ type: 'break' })
           start = position + match[0].length
           match = find.exec(node.value)
         }
 
         if (result.length > 0 && parent && typeof index === 'number') {
           if (start < node.value.length) {
-            result.push({type: 'text', value: node.value.slice(start)})
+            result.push({ type: 'text', value: node.value.slice(start) })
           }
 
           parent.children.splice(index, 1, ...result)
@@ -61,31 +59,33 @@ const callouts: Plugin = function (providedConfig?: Partial<Config>) {
       /** add classnames to headings within blockquotes,
        * mainly to identify when using other plugins that
        * might interfere. for eg, rehype-auto-link-headings.
-      */
-      visit(node, 'heading', (node) => {
+       */
+      visit(node, 'heading', node => {
         const heading = node as Heading
         heading.data = {
           hProperties: {
-            className: 'blockquote-heading'
-          }
+            className: 'blockquote-heading',
+          },
         }
       })
 
       // styles
       let defaultStyles: any = {
         hProperties: {
-          className: 'blockquote'
-        }
+          className: 'blockquote',
+        },
       }
 
       let styleNode: any = {
         type: 'element',
         data: {
           hName: 'style',
-          hChildren: [{
-            type: 'text',
-            value: styles
-          }]
+          hChildren: [
+            {
+              type: 'text',
+              value: styles,
+            },
+          ],
         },
       }
 
@@ -95,15 +95,14 @@ const callouts: Plugin = function (providedConfig?: Partial<Config>) {
         type: 'element',
         tagName: 'div',
         data: {
-          hProperties: {}
+          hProperties: {},
         },
-        children: [styleNode, node]
+        children: [styleNode, node],
       }
 
       parent.children.splice(index, 1, wrapper)
 
-
-      const blockquote: {[index: string]: any} = wrapper.children[1] as Blockquote
+      const blockquote: { [index: string]: any } = wrapper.children[1] as Blockquote
 
       // add default styles
       blockquote.data = defaultStyles
@@ -130,25 +129,24 @@ const callouts: Plugin = function (providedConfig?: Partial<Config>) {
       // update content if it's within the same paragraph
       if (rest.length > 0) {
         // remove first <br> element
-        rest.splice(0,1)
+        rest.splice(0, 1)
         paragraph.children = rest
       } else {
         // remove the p tag if its empty
-        blockquote.children.splice(0,1)
+        blockquote.children.splice(0, 1)
       }
 
       const isOneOfKeywords = new RegExp(defaultKeywords).test(keyword)
 
-      const formattedTitle: string = 
-        title?.trim() || (typeof keyword.charAt(0) === 'string' 
-          ? keyword.charAt(0).toUpperCase() + keyword.slice(1) 
-          : keyword
-        )
+      const formattedTitle: string =
+        title?.trim() ||
+        (typeof keyword.charAt(0) === 'string' ? keyword.charAt(0).toUpperCase() + keyword.slice(1) : keyword)
 
-      const entry: {[index: string]: Object | string} = 
-        isOneOfKeywords ? config?.types[keyword] : config?.types['note'] // default to note style
+      const entry: { [index: string]: Object | string } = isOneOfKeywords
+        ? config?.types[keyword]
+        : config?.types['note'] // default to note style
 
-      const settings: {[index: string]: any} = typeof entry === 'string' ? config?.types[entry]: entry
+      const settings: { [index: string]: any } = typeof entry === 'string' ? config?.types[entry] : entry
 
       let parsedSvg
 
@@ -166,32 +164,36 @@ const callouts: Plugin = function (providedConfig?: Partial<Config>) {
             data: {
               hName: 'span',
               hProperties: {
-                style: `color:${settings?.color}`
+                style: `color:${settings?.color}`,
               },
-              hChildren: parsedSvg?.children ? parsedSvg.children : []
-            }
+              hChildren: parsedSvg?.children ? parsedSvg.children : [],
+            },
           },
           {
             type: 'element',
             tagName: 'strong',
             data: {
               hName: 'strong',
-              hChildren: [{
-                type: 'text',
-                value: formattedTitle
-              }]
-            }
-          }
+              hChildren: [
+                {
+                  type: 'text',
+                  value: formattedTitle,
+                },
+              ],
+            },
+          },
         ],
         data: {
           ...blockquote.children[0]?.data,
           hProperties: {
-            className: formatClassNameMap(config.classNameMaps.title + ' ' + (isOneOfKeywords ? keyword : 'note'))(keyword),
-            style: `background-color: ${settings?.color}1a;`
+            className: formatClassNameMap(config.classNameMaps.title + ' ' + (isOneOfKeywords ? keyword : 'note'))(
+              keyword
+            ),
+            style: `background-color: ${settings?.color}1a;`,
           },
-        }
+        },
       }
-      
+
       // wrap blockquote content in div
       let contentNode: any = {
         type: 'element',
@@ -199,18 +201,19 @@ const callouts: Plugin = function (providedConfig?: Partial<Config>) {
         data: {
           hProperties: {
             className: 'callout-content',
-            style: parent.type !== 'root' 
-              ? `border-right:1px solid ${settings?.color}33;
+            style:
+              parent.type !== 'root'
+                ? `border-right:1px solid ${settings?.color}33;
                 border-bottom:1px solid ${settings?.color}33;`
-              : ''
+                : '',
           },
-        }
+        },
       }
 
       blockquote.children = [titleNode]
 
-      if (rest.length > 0 ) blockquote.children.push(contentNode)
-      
+      if (rest.length > 0) blockquote.children.push(contentNode)
+
       // Add classes for the callout block
       blockquote.data = config.dataMaps.block({
         ...blockquote.data,
@@ -232,7 +235,7 @@ export interface Config {
   dataMaps: {
     block: (data: Data) => Data
     title: (data: Data) => Data
-  },
+  }
   types: { [index: string]: any }
 }
 export const defaultConfig: Config = {
@@ -244,7 +247,7 @@ export const defaultConfig: Config = {
     block: data => data,
     title: data => data,
   },
-  types: { ...types }
+  types: { ...types },
 }
 
 type ClassNames = string | string[]
