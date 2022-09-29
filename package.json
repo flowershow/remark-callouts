@@ -59,6 +59,7 @@
     "unified": "^10.1.2"
   },
   "dependencies": {
+    "mdast-util-from-markdown": "^1.2.0",
     "unist-util-visit": "^4.1.0"
   }
 }
