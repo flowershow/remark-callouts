@@ -53,7 +53,7 @@ describe('remark callouts', function () {
 > content
     `)
     const doc = parseDocument(html)
-    const calloutTitle = selectOne('div > blockquote.callout > div.callout-title.tip > strong', doc)
+    const calloutTitle = selectOne('div > blockquote.callout > div.callout-title.tip > strong > p', doc)
 
     expect(calloutTitle).to.have.nested.property('firstChild.data', 'Custom Title')
   })
@@ -75,7 +75,7 @@ describe('remark callouts', function () {
 > content
     `)
     const doc = parseDocument(html)
-    const calloutTitle = selectOne('div > blockquote.callout > div.callout-title.note > strong', doc)
+    const calloutTitle = selectOne('div > blockquote.callout > div.callout-title.note > strong > p', doc)
 
     expect(calloutTitle).to.have.nested.property('firstChild.data', 'Some title')
   })

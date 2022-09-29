@@ -1,12 +1,13 @@
 import { visit } from 'unist-util-visit'
+import { fromMarkdown } from 'mdast-util-from-markdown'
 import type { Plugin } from 'unified'
-import type { Data } from 'unist'
-import type { Blockquote, Heading } from 'mdast'
+import type { Node, Data, Parent } from 'unist'
+import type { Blockquote, Heading, Text, BlockContent } from 'mdast'
 import { parse } from 'svg-parser'
 import { types } from './types.js'
 
 // escape regex special characters
-function escapeRegExp(s: String) {
+function escapeRegExp(s: string) {
   return s.replace(new RegExp(`[-[\\]{}()*+?.\\\\^$|/]`, 'g'), '\\$&')
 }
 
@@ -18,7 +19,7 @@ const callouts: Plugin = function (providedConfig?: Partial<Config>) {
   const defaultKeywords: string = Object.keys(config.types).map(escapeRegExp).join('|')
 
   return function (tree) {
-    visit(tree, (node: any, index, parent: { [index: string]: any }) => {
+    visit(tree, (node: Node, index, parent: Parent<Node>) => {
       // Filter required elems
       if (node.type !== 'blockquote') return
 
@@ -26,7 +27,7 @@ const callouts: Plugin = function (providedConfig?: Partial<Config>) {
        *  code taken directly from remark-breaks,
        *  see https://github.com/remarkjs/remark-breaks for more info on what this does.
        */
-      visit(node, 'text', (node: any, index, parent) => {
+      visit(node, 'text', (node: Text, index: number, parent: Parent) => {
         const result = []
         let start = 0
 
@@ -70,13 +71,13 @@ const callouts: Plugin = function (providedConfig?: Partial<Config>) {
       })
 
       // styles
-      let defaultStyles: any = {
+      const defaultStyles: object = {
         hProperties: {
           className: 'blockquote',
         },
       }
 
-      let styleNode: any = {
+      const styleNode: object = {
         type: 'element',
         data: {
           hName: 'style',
@@ -90,7 +91,7 @@ const callouts: Plugin = function (providedConfig?: Partial<Config>) {
       }
 
       // wrap blockquote and styles in a div
-      const wrapper: any = {
+      const wrapper = {
         ...node,
         type: 'element',
         tagName: 'div',
@@ -100,12 +101,12 @@ const callouts: Plugin = function (providedConfig?: Partial<Config>) {
         children: [styleNode, node],
       }
 
-      parent.children.splice(index, 1, wrapper)
+      parent.children.splice(Number(index), 1, wrapper)
 
-      const blockquote: { [index: string]: any } = wrapper.children[1] as Blockquote
+      const blockquote = wrapper.children[1] as Blockquote
 
       // add default styles
-      blockquote.data = defaultStyles
+      blockquote.data = { ...defaultStyles }
 
       // check for callout syntax starts here
       if (blockquote.children.length <= 0 || blockquote.children[0].type !== 'paragraph') return
@@ -115,7 +116,7 @@ const callouts: Plugin = function (providedConfig?: Partial<Config>) {
 
       const [t, ...rest] = paragraph.children
 
-      const regex = new RegExp(`^\\[!(?<keyword>(.*))\\][\t\f ]?(?<title>.*?)$`, 'gi')
+      const regex = new RegExp(`^\\[!(?<keyword>(.*?))\\][\t\f ]?(?<title>.*?)$`, 'gi')
       const m = regex.exec(t.value)
 
       // if no callout syntax, forget about it.
@@ -126,36 +127,44 @@ const callouts: Plugin = function (providedConfig?: Partial<Config>) {
       // if there's nothing inside the brackets, is it really a callout ?
       if (!keyword) return
 
-      // update content if it's within the same paragraph
-      if (rest.length > 0) {
-        // remove first <br> element
-        rest.splice(0, 1)
-        paragraph.children = rest
+      const isOneOfKeywords: boolean = new RegExp(defaultKeywords).test(keyword)
+
+      if (title) {
+        const mdast = fromMarkdown(title.trim()).children[0]
+        if (mdast.type === 'heading') {
+          mdast.data = {
+            ...mdast.data,
+            hProperties: {
+              className: 'blockquote-heading',
+            },
+          }
+        }
+        blockquote.children.unshift(mdast as BlockContent)
       } else {
-        // remove the p tag if its empty
-        blockquote.children.splice(0, 1)
+        t.value = typeof keyword.charAt(0) === 'string' ? keyword.charAt(0).toUpperCase() + keyword.slice(1) : keyword
       }
 
-      const isOneOfKeywords = new RegExp(defaultKeywords).test(keyword)
+      const entry: { [index: string]: string } = {}
 
-      const formattedTitle: string =
-        title?.trim() ||
-        (typeof keyword.charAt(0) === 'string' ? keyword.charAt(0).toUpperCase() + keyword.slice(1) : keyword)
-
-      const entry: { [index: string]: Object | string } = isOneOfKeywords
-        ? config?.types[keyword]
-        : config?.types['note'] // default to note style
-
-      const settings: { [index: string]: any } = typeof entry === 'string' ? config?.types[entry] : entry
+      if (isOneOfKeywords) {
+        if (typeof config?.types[keyword] === 'string') {
+          const e = String(config?.types[keyword])
+          Object.assign(entry, config?.types[e])
+        } else {
+          Object.assign(entry, config?.types[keyword])
+        }
+      } else {
+        Object.assign(entry, config?.types['note'])
+      }
 
       let parsedSvg
 
-      if (settings && settings.svg) {
-        parsedSvg = parse(settings.svg)
+      if (entry && entry.svg) {
+        parsedSvg = parse(entry.svg)
       }
 
       // create icon and title node wrapped in div
-      let titleNode: any = {
+      const titleNode: object = {
         type: 'element',
         children: [
           {
@@ -164,38 +173,44 @@ const callouts: Plugin = function (providedConfig?: Partial<Config>) {
             data: {
               hName: 'span',
               hProperties: {
-                style: `color:${settings?.color}`,
+                style: `color:${entry?.color}`,
               },
               hChildren: parsedSvg?.children ? parsedSvg.children : [],
             },
           },
           {
             type: 'element',
-            tagName: 'strong',
+            children: title ? [blockquote.children[0]] : [t],
             data: {
               hName: 'strong',
-              hChildren: [
-                {
-                  type: 'text',
-                  value: formattedTitle,
-                },
-              ],
             },
           },
         ],
         data: {
           ...blockquote.children[0]?.data,
           hProperties: {
-            className: formatClassNameMap(config.classNameMaps.title + ' ' + (isOneOfKeywords ? keyword : 'note'))(
-              keyword
-            ),
-            style: `background-color: ${settings?.color}1a;`,
+            className: `${formatClassNameMap(config.classNameMaps.title)(keyword)} ${
+              isOneOfKeywords ? keyword : 'note'
+            }`,
+            style: `background-color: ${entry?.color}1a;`,
           },
         },
       }
 
+      // remove the callout paragraph from the content body
+      if (title) {
+        blockquote.children.shift()
+      }
+
+      if (rest.length > 0) {
+        rest.shift()
+        paragraph.children = rest
+      } else {
+        blockquote.children.shift()
+      }
+
       // wrap blockquote content in div
-      let contentNode: any = {
+      const contentNode: object = {
         type: 'element',
         children: blockquote.children,
         data: {
@@ -203,23 +218,22 @@ const callouts: Plugin = function (providedConfig?: Partial<Config>) {
             className: 'callout-content',
             style:
               parent.type !== 'root'
-                ? `border-right:1px solid ${settings?.color}33;
-                border-bottom:1px solid ${settings?.color}33;`
+                ? `border-right:1px solid ${entry?.color}33;
+                border-bottom:1px solid ${entry?.color}33;`
                 : '',
           },
         },
       }
 
-      blockquote.children = [titleNode]
-
-      if (rest.length > 0) blockquote.children.push(contentNode)
+      if (blockquote.children.length > 0) blockquote.children = [contentNode] as BlockContent[]
+      blockquote.children.unshift(titleNode as BlockContent)
 
       // Add classes for the callout block
       blockquote.data = config.dataMaps.block({
         ...blockquote.data,
         hProperties: {
           className: formatClassNameMap(config.classNameMaps.block)(keyword),
-          style: `border-left-color:${settings?.color};`,
+          style: `border-left-color:${entry?.color};`,
         },
       })
     })
@@ -236,8 +250,9 @@ export interface Config {
     block: (data: Data) => Data
     title: (data: Data) => Data
   }
-  types: { [index: string]: any }
+  types: { [index: string]: string | object }
 }
+
 export const defaultConfig: Config = {
   classNameMaps: {
     block: 'callout',
@@ -294,21 +309,30 @@ const styles = `
     padding: 10px 20px;
   }
 
-  .callout-content > .blockquote-heading {
-    margin: 5px 0 0 0 !important;
+  .blockquote-heading {
+    margin: 5px 0 !important;
     padding: 0 !important;
   }
 
-  .blockquote > p, .callout-content > p {
+  .blockquote > p,
+  .callout-content > p {
     font-weight: normal;
     margin: 5px 0;
   }
 
-  .blockquote > p:before, p:after {
+  .callout-title p {
+    margin: 0
+  }
+
+  .callout-title > strong {
+    line-height: 1.5;
+  }
+
+  .callout p:before, p:after {
     display: none;
   }
 
-  .callout-content > p:before, p:after {
+  .blockquote > p:before, p:after {
     display: none;
   }
 `

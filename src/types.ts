@@ -1,4 +1,4 @@
-export const types: { [index: string]: any } = {
+export const types = {
   // aliases
   summary: 'abstract',
   tldr: 'abstract',
