@@ -1,6 +1,6 @@
 {
   "name": "remark-callouts",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "remark plugin to add support for blockquote-based admonitions/callouts",
   "main": "dist/index.js",
   "scripts": {
