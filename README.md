@@ -7,6 +7,8 @@ Remark plugin to add support for blockquote-based callouts/admonitions similar t
 Using Obsidian, when we type in the following syntax `> [!tip]` inside a blockquote it would render them as a callout.
 See https://help.obsidian.md/How+to/Use+callouts for more.
 
+<img width="645" alt="Tip callout block" src="https://user-images.githubusercontent.com/42637597/193016397-49a90b44-cf3d-4eeb-9ad6-c0c1e374ed27.png">
+
 ## Features supported
 
 - [x] Supports blockquote obsidian style callouts
