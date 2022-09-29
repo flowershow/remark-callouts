@@ -29,6 +29,7 @@ specifiers:
 
 dependencies:
   mdast-util-from-markdown: 1.2.0
+  svg-parser: 2.0.4
   unist-util-visit: 4.1.0
 
 devDependencies:
@@ -51,7 +52,6 @@ devDependencies:
   remark: 14.0.2
   remark-parse: 10.0.1
   remark-rehype: 10.1.0
-  svg-parser: 2.0.4
   ts-node: 10.8.0_smgpfffxrhk5i4ijhe3532b4hq
   typescript: 4.7.2
   unified: 10.1.2
@@ -1727,7 +1727,7 @@ packages:
 
   /svg-parser/2.0.4:
     resolution: {integrity: sha512-e4hG1hRwoOdRb37cIMSgzNsxyzKfayW6VOflrwvR+/bzrkyxY/31WkbgnQpgtrNp1SdpJvpUAGTa/ZoiPNDuRQ==}
-    dev: true
+    dev: false
 
   /text-table/0.2.0:
     resolution: {integrity: sha1-f17oI66AUgfACvLfSoTsP8+lcLQ=}
