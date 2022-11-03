@@ -79,6 +79,14 @@ HTML output
 - example
 - quote `alias: cite`
 
+# Change Log
+ 
+## [1.0.2] - 2022-11-03
+
+### Fixed
+
+- Case insensitive match for types.
+
 ## License
 
 MIT

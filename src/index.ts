@@ -122,11 +122,12 @@ const callouts: Plugin = function (providedConfig?: Partial<Config>) {
       // if no callout syntax, forget about it.
       if (!m) return
 
-      const [keyword, title] = [m.groups?.keyword, m.groups?.title]
+      const [key, title] = [m.groups?.keyword, m.groups?.title]
 
       // if there's nothing inside the brackets, is it really a callout ?
-      if (!keyword) return
+      if (!key) return
 
+      const keyword = key.toLowerCase()
       const isOneOfKeywords: boolean = new RegExp(defaultKeywords).test(keyword)
 
       if (title) {
@@ -141,7 +142,9 @@ const callouts: Plugin = function (providedConfig?: Partial<Config>) {
         }
         blockquote.children.unshift(mdast as BlockContent)
       } else {
-        t.value = typeof keyword.charAt(0) === 'string' ? keyword.charAt(0).toUpperCase() + keyword.slice(1) : keyword
+        t.value = typeof keyword.charAt(0) === 'string' 
+          ? keyword.charAt(0).toUpperCase() + keyword.slice(1)
+          : keyword
       }
 
       const entry: { [index: string]: string } = {}
@@ -232,7 +235,7 @@ const callouts: Plugin = function (providedConfig?: Partial<Config>) {
       blockquote.data = config.dataMaps.block({
         ...blockquote.data,
         hProperties: {
-          className: formatClassNameMap(config.classNameMaps.block)(keyword),
+          className: formatClassNameMap(config.classNameMaps.block)(keyword.toLowerCase()),
           style: `border-left-color:${entry?.color};`,
         },
       })
