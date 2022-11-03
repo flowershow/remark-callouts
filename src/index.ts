@@ -142,9 +142,7 @@ const callouts: Plugin = function (providedConfig?: Partial<Config>) {
         }
         blockquote.children.unshift(mdast as BlockContent)
       } else {
-        t.value = typeof keyword.charAt(0) === 'string' 
-          ? keyword.charAt(0).toUpperCase() + keyword.slice(1)
-          : keyword
+        t.value = typeof keyword.charAt(0) === 'string' ? keyword.charAt(0).toUpperCase() + keyword.slice(1) : keyword
       }
 
       const entry: { [index: string]: string } = {}
