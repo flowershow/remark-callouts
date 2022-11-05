@@ -36,6 +36,16 @@ describe('remark callouts', function () {
     expect(calloutContent).to.have.nested.property('firstChild.data', 'example content here')
   })
 
+  it('parses a blockquote callout with case insensitive keyword', async function () {
+    const html = await mdToHtml(`\
+> [!INFO]
+    `)
+    const doc = parseDocument(html)
+    const calloutTitle = selectOne('div > blockquote.callout > div.callout-title.info > strong', doc)
+
+    expect(calloutTitle).to.have.nested.property('firstChild.data', 'Info')
+  })
+
   it('parses a blockquote callout with an icon', async function () {
     const html = await mdToHtml(`\
 > [!tip]
