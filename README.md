@@ -1,19 +1,23 @@
 # remark-callouts
 
-Remark plugin to add support for blockquote-based callouts/admonitions similar to Obsidian style.
+Remark plugin to add support for blockquote-based callouts/admonitions similar to the approach of [Obsidian](https://help.obsidian.md/How+to/Use+callouts) and [Microsoft Learn](https://learn.microsoft.com/en-us/contribute/markdown-reference#alerts-note-tip-important-caution-warning) style.
 
-## What is this ?
+Using this plugin, markdown like this:
 
-Using Obsidian, when we type in the following syntax `> [!tip]` inside a blockquote it would render them as a callout.
-See https://help.obsidian.md/How+to/Use+callouts for more.
+```md
+> [!tip]
+> ...
+```
+
+Would render as a callout like this:
 
 <img width="645" alt="Tip callout block" src="https://user-images.githubusercontent.com/42637597/193016397-49a90b44-cf3d-4eeb-9ad6-c0c1e374ed27.png">
 
 ## Features supported
 
-- [x] Supports blockquote obsidian style callouts
+- [x] Supports blockquote style callouts
 - [x] Supports nested blockquote callouts
-- [x] Supports 13 types with appropriate styling in default theme
+- [x] Supports 13 types out of the box (with appropriate styling in default theme) - see list below
 - [x] Supports aliases for types
 - [x] Defaults to note style callout for all other types eg. `> [!xyz]`
 - [x] Supports dark and light mode styles
@@ -63,7 +67,7 @@ HTML output
 </div>
 ```
 
-### Supported Types
+### Supported Callout Types
 
 - note
 - tip `aliases: hint, important`
