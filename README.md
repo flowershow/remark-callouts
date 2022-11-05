@@ -6,7 +6,7 @@ Using this plugin, markdown like this:
 
 ```md
 > [!tip]
-> ...
+> hello callout
 ```
 
 Would render as a callout like this:
