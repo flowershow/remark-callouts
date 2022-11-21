@@ -1,10 +1,12 @@
 {
   "name": "remark-callouts",
-  "version": "1.0.2",
+  "version": "2.0.0",
   "description": "remark plugin to add support for blockquote-based admonitions/callouts",
   "main": "dist/index.js",
+  "module": "dist/index.esm.js",
+  "browser": "dist/index.umd.js",
   "scripts": {
-    "build": "tsc --project tsconfig.build.json",
+    "build": "rollup -c",
     "test": "mocha",
     "lint": "eslint .",
     "format": "prettier --write .",
@@ -32,8 +34,13 @@
   "files": [
     "dist"
   ],
-  "exports": "./dist/index.js",
+  "exports": {
+    ".": "./dist/index.js",
+    "./styles.css": "./dist/styles.css"
+  },
   "devDependencies": {
+    "@rollup/plugin-node-resolve": "^15.0.1",
+    "@rollup/plugin-typescript": "^9.0.2",
     "@types/chai": "^4.3.1",
     "@types/mdast": "^3.0.10",
     "@types/mocha": "^9.1.1",
@@ -53,6 +60,8 @@
     "remark": "^14.0.2",
     "remark-parse": "^10.0.1",
     "remark-rehype": "^10.1.0",
+    "rollup-plugin-postcss": "^4.0.2",
+    "rollup-plugin-terser": "^7.0.2",
     "ts-node": "^10.8.0",
     "typescript": "^4.7.2",
     "unified": "^10.1.2"
