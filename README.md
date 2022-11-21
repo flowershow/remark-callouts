@@ -19,7 +19,7 @@ Would render as a callout like this:
 - [x] Supports nested blockquote callouts
 - [x] Supports 13 types out of the box (with appropriate styling in default theme) - see list below
 - [x] Supports aliases for types
-- [x] Defaults to note style callout for all other types eg. `> [!xyz]`
+- [x] Defaults to note callout for all other types eg. `> [!xyz]`
 - [x] Supports dark and light mode styles
 
 Future support:
@@ -52,10 +52,9 @@ HTML output
 
 ```js
 <div>
-  <style>...</style>
   <blockquote class="callout">
-    <div class="callout-title">
-      <span>
+    <div class="callout-title tip">
+      <span class="callout-icon">
         <svg>...</svg>
       </span>
       <strong>Tip</strong>
@@ -65,6 +64,17 @@ HTML output
     </div>
   </blockquote>
 </div>
+```
+
+Import the styles in your .css file
+
+```css
+@import "remark-callouts/styles.css"
+```
+or in your app.js
+
+```js
+import "remark-callouts/styles.css"
 ```
 
 ### Supported Callout Types
@@ -84,6 +94,16 @@ HTML output
 - quote `alias: cite`
 
 # Change Log
+
+## [2.0.0] - 2022-11-21
+
+### Added
+
+- Classname for icon.
+
+### Changed
+
+- Extract css styles which can be imported separately.
 
 ## [1.0.2] - 2022-11-03
 
