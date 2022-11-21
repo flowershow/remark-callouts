@@ -52,7 +52,7 @@ describe('remark callouts', function () {
 > example content here
     `)
     const doc = parseDocument(html)
-    const calloutIcon = selectOne('div > blockquote.callout > div.callout-title.tip > span > svg', doc)
+    const calloutIcon = selectOne('div > blockquote.callout > div.callout-title.tip > span.callout-icon > svg', doc)
 
     expect(calloutIcon).to.exist
   })
@@ -104,29 +104,5 @@ describe('remark callouts', function () {
     )
 
     expect(nestedCallout).to.have.nested.property('firstChild.data', 'Info')
-  })
-
-  it('parses a blockquote with default styles', async function () {
-    const html = await mdToHtml(`\
-> With default style
-    `)
-    const doc = parseDocument(html)
-    const styles = selectOne('div > style', doc)
-    const blockquoteClass = selectOne('div > blockquote.blockquote', doc)
-
-    expect(styles).to.exist
-    expect(blockquoteClass).to.exist
-  })
-
-  it('parses a blockquote with callout styles', async function () {
-    const html = await mdToHtml(`\
-> [!tip]
-    `)
-    const doc = parseDocument(html)
-    const styles = selectOne('div > style', doc)
-    const calloutClass = selectOne('div > blockquote.callout', doc)
-
-    expect(styles).to.exist
-    expect(calloutClass).to.exist
   })
 })
