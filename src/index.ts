@@ -70,27 +70,7 @@ const callouts: Plugin = function (providedConfig?: Partial<Config>) {
         }
       })
 
-      // styles
-      const defaultStyles: object = {
-        hProperties: {
-          className: 'blockquote',
-        },
-      }
-
-      const styleNode: object = {
-        type: 'element',
-        data: {
-          hName: 'style',
-          hChildren: [
-            {
-              type: 'text',
-              value: styles,
-            },
-          ],
-        },
-      }
-
-      // wrap blockquote and styles in a div
+      // wrap blockquote in a div
       const wrapper = {
         ...node,
         type: 'element',
@@ -98,15 +78,18 @@ const callouts: Plugin = function (providedConfig?: Partial<Config>) {
         data: {
           hProperties: {},
         },
-        children: [styleNode, node],
+        children: [node],
       }
 
       parent.children.splice(Number(index), 1, wrapper)
 
-      const blockquote = wrapper.children[1] as Blockquote
+      const blockquote = wrapper.children[0] as Blockquote
 
-      // add default styles
-      blockquote.data = { ...defaultStyles }
+      blockquote.data = {
+        hProperties: {
+          className: 'blockquote',
+        },
+      }
 
       // check for callout syntax starts here
       if (blockquote.children.length <= 0 || blockquote.children[0].type !== 'paragraph') return
@@ -175,6 +158,7 @@ const callouts: Plugin = function (providedConfig?: Partial<Config>) {
               hName: 'span',
               hProperties: {
                 style: `color:${entry?.color}`,
+                className: 'callout-icon'
               },
               hChildren: parsedSvg?.children ? parsedSvg.children : [],
             },
@@ -183,7 +167,7 @@ const callouts: Plugin = function (providedConfig?: Partial<Config>) {
             type: 'element',
             children: title ? [blockquote.children[0]] : [t],
             data: {
-              hName: 'strong',
+              hName: 'strong'
             },
           },
         ],
@@ -274,66 +258,3 @@ function formatClassNameMap(gen: ClassNameMap) {
     return typeof classNames == 'object' ? classNames.join(' ') : classNames
   }
 }
-
-const styles = `
-  :root {
-    --callout-bg-color: #f2f3f5;
-  }
-
-  :root.dark {
-    --callout-bg-color: #161616;
-  }
-
-  .blockquote, .callout {
-    background: #f2f3f5;
-    background: var(--callout-bg-color);
-    font-style: normal;
-    border-radius: 2px;
-  }
-
-  .callout {
-    padding: 0 !important;
-  }
-
-  .callout-title {
-    display: flex;
-    align-items: center;
-    padding:10px;
-    gap: 10px;
-  }
-
-  .callout-title > strong {
-    font-weight: 700;
-  }
-
-  .blockquote, .callout-content {
-    padding: 10px 20px;
-  }
-
-  .blockquote-heading {
-    margin: 5px 0 !important;
-    padding: 0 !important;
-  }
-
-  .blockquote > p,
-  .callout-content > p {
-    font-weight: normal;
-    margin: 5px 0;
-  }
-
-  .callout-title p {
-    margin: 0
-  }
-
-  .callout-title > strong {
-    line-height: 1.5;
-  }
-
-  .callout p:before, p:after {
-    display: none;
-  }
-
-  .blockquote > p:before, p:after {
-    display: none;
-  }
-`
